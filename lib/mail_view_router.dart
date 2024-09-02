@@ -1,14 +1,13 @@
+import 'package:animations/animations.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:reply/custom_transition_page.dart';
 
 import 'home.dart';
 import 'inbox.dart';
 import 'model/email_store.dart';
 
-class MailViewRouterDelegate extends RouterDelegate<void>
-    with ChangeNotifier, PopNavigatorRouterDelegateMixin {
+class MailViewRouterDelegate extends RouterDelegate<void> with ChangeNotifier, PopNavigatorRouterDelegateMixin {
   MailViewRouterDelegate({required this.drawerController});
 
   final AnimationController drawerController;
@@ -27,10 +26,10 @@ class MailViewRouterDelegate extends RouterDelegate<void>
           onPopPage: handlePopPage,
           pages: [
             // TODO: Add Fade through transition between mailbox pages (Motion)
-            CustomTransitionPage(
+            FadeThroughTransitionPageWrapper(
               transitionKey: ValueKey(currentlySelectedInbox),
-              screen: InboxPage(
-                destination: currentlySelectedInbox,
+              mailbox: InboxPage(
+                destination: currentlySelectedInbox, // determines what inbox view is being displayed
               ),
             )
           ],
@@ -44,8 +43,7 @@ class MailViewRouterDelegate extends RouterDelegate<void>
 
   @override
   Future<bool> popRoute() {
-    var emailStore =
-        Provider.of<EmailStore>(navigatorKey.currentContext!, listen: false);
+    var emailStore = Provider.of<EmailStore>(navigatorKey.currentContext!, listen: false);
     bool onCompose = emailStore.onCompose;
 
     bool onMailView = emailStore.onMailView;
@@ -71,7 +69,6 @@ class MailViewRouterDelegate extends RouterDelegate<void>
     // Handles the back button when on the [ComposePage].
     if (onCompose) {
       // TODO: Add Container Transform from FAB to compose email page (Motion)
-      emailStore.onCompose = false;
       return SynchronousFuture<bool>(false);
     }
 
@@ -87,8 +84,7 @@ class MailViewRouterDelegate extends RouterDelegate<void>
     // to notify listeners that we are no longer on the MailView.
     if (navigatorKey.currentState!.canPop()) {
       navigatorKey.currentState!.pop();
-      Provider.of<EmailStore>(navigatorKey.currentContext!, listen: false)
-          .currentlySelectedEmailId = -1;
+      Provider.of<EmailStore>(navigatorKey.currentContext!, listen: false).currentlySelectedEmailId = -1;
       return SynchronousFuture<bool>(true);
     }
 
@@ -103,3 +99,38 @@ class MailViewRouterDelegate extends RouterDelegate<void>
 }
 
 // TODO: Add Fade through transition between mailbox pages (Motion)
+
+class FadeThroughTransitionPageWrapper extends Page {
+  final Widget mailbox;
+
+  final ValueKey transitionKey;
+
+  const FadeThroughTransitionPageWrapper({
+    required this.mailbox,
+    required this.transitionKey,
+  }) : super(key: transitionKey);
+
+  @override
+  Route createRoute(BuildContext context) {
+    return PageRouteBuilder(
+      settings: this,
+      transitionDuration: const Duration(seconds: 3),
+      reverseTransitionDuration: const Duration(seconds: 3),
+      transitionsBuilder: (context, animation, secondaryAnimation, child) {
+        return FadeThroughTransition(
+          fillColor: Theme.of(context).scaffoldBackgroundColor,
+          animation: animation,
+          secondaryAnimation: secondaryAnimation,
+          child: child,
+        );
+      },
+      pageBuilder: (context, animation, secondaryAnimation) => mailbox,
+    );
+  }
+}
+
+// FadeThroughTransition - Animated Widget - animations package
+
+//   - outgoing elements fade out, incoming elements fade in and scale up
+
+//??  - why is a ValueKey required?

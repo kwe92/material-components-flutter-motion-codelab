@@ -2,11 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import 'colors.dart';
-import 'home.dart';
 import 'mail_view_page.dart';
 import 'model/email_model.dart';
 import 'model/email_store.dart';
 import 'profile_avatar.dart';
+import 'package:animations/animations.dart';
 
 class MailPreviewCard extends StatelessWidget {
   const MailPreviewCard({
@@ -47,23 +47,10 @@ class MailPreviewCard extends StatelessWidget {
     // TODO: Add Container Transform transition from email list to email detail page (Motion)
     return Material(
       color: theme.cardColor,
-      child: InkWell(
-        onTap: () {
-          Provider.of<EmailStore>(
-            context,
-            listen: false,
-          ).currentlySelectedEmailId = id;
-
-          mobileMailNavKey.currentState!.push(
-            PageRouteBuilder(
-              pageBuilder: (BuildContext context, Animation<double> animation,
-                  Animation<double> secondaryAnimation) {
-                return MailViewPage(id: id, email: email);
-              },
-            ),
-          );
-        },
-        child: Dismissible(
+      child: _OpenContainerWrapper(
+        id: id,
+        email: email,
+        closedChild: Dismissible(
           key: ObjectKey(email),
           dismissThresholds: const {
             DismissDirection.startToEnd: 0.8,
@@ -102,12 +89,8 @@ class MailPreviewCard extends StatelessWidget {
           },
           secondaryBackground: _DismissibleContainer(
             icon: 'twotone_star',
-            backgroundColor: currentEmailStarred
-                ? colorScheme.secondary
-                : theme.scaffoldBackgroundColor,
-            iconColor: currentEmailStarred
-                ? colorScheme.onSecondary
-                : colorScheme.onBackground,
+            backgroundColor: currentEmailStarred ? colorScheme.secondary : theme.scaffoldBackgroundColor,
+            iconColor: currentEmailStarred ? colorScheme.onSecondary : colorScheme.onBackground,
             alignment: Alignment.centerRight,
             padding: const EdgeInsetsDirectional.only(end: 20),
           ),
@@ -228,7 +211,7 @@ class _MailPreview extends StatelessWidget {
                   ),
                 ),
                 if (email.containsPictures) ...[
-                  Flexible(
+                  const Flexible(
                     fit: FlexFit.loose,
                     child: Column(
                       children: const [
@@ -294,3 +277,66 @@ class _MailPreviewActionBar extends StatelessWidget {
     );
   }
 }
+
+class _OpenContainerWrapper extends StatelessWidget {
+  final int id;
+  final Email email;
+  final Widget closedChild;
+
+  const _OpenContainerWrapper({
+    required this.id,
+    required this.email,
+    required this.closedChild,
+    super.key,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    return OpenContainer(
+      transitionType: ContainerTransitionType.fadeThrough,
+      transitionDuration: const Duration(milliseconds: 2000),
+      openBuilder: (context, closedContainer) => MailViewPage(id: id, email: email),
+      openColor: theme.cardColor,
+      closedShape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.all(Radius.circular(0)),
+      ),
+      closedElevation: 0,
+      closedColor: theme.cardColor,
+      closedBuilder: (context, openContainer) {
+        final emailStoreReadOnly = Provider.of<EmailStore>(context, listen: false);
+
+        return InkWell(
+          onTap: () {
+            emailStoreReadOnly.currentlySelectedEmailId = id;
+            openContainer.call(); // closedBuilder should call the function that is passed in as an argument to open the container
+          },
+          child: closedChild,
+        );
+      },
+    );
+  }
+}
+
+// OpenContainer - Animated Widget - Container Transform Transition - animations package
+
+//   - a widget that grows to fill the screen when tapped while fading in and out, transitioning from a closed state to an open state
+
+//   - when in a closed state the closed widget is shown and when in an open state the open widget is shown
+
+//   - can be used to transition from one screen to another with a custom transition animation
+
+//   - has properties that allow you to change the animation behavior and determine how
+//     the returned widgets are shaped, elevated and painted and how their background is painted during the transition
+
+//??   - the widgets returned by the open and close builders exist in the widget tree at the same time
+//??     requiring them to have a distinct key if they are the same type of widget
+
+//   - OpenContainer has internal state managing wither the widget is in an open state or closed state
+
+//   - transition animations happen when the widget returned by openBuilder is placed onto or popped off of the Navigator stack be it internally of using Navigator.pop()
+
+//   - transitioning from an open state to a closed state rebuilds the OpenContainer effectively poping off the widget returned by the openBuilder callback
+
+//??   - Note: the widget returned by the closeBuilder tends to be the smaller of the two widgets you are transitioning between
+//??     the widget returned by the openBuilder tends to be a widget that would take up the entire views hence the strinking and growing aspect

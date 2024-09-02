@@ -54,8 +54,7 @@ class EmailStore with ChangeNotifier {
       sender: 'Trevor Hansen',
       time: '9 hrs ago',
       subject: 'Brazil trip',
-      message:
-          'Thought we might be able to go over some details about our upcoming vacation.\n\n'
+      message: 'Thought we might be able to go over some details about our upcoming vacation.\n\n'
           'I\'ve been doing a bit of research and have come across a few paces in Northern Brazil that I think we should check out. '
           'One, the north has some of the most predictable wind on the planet. '
           'I\'d love to get out on the ocean and kitesurf for a couple of days if we\'re going to be anywhere near or around Taiba. '
@@ -105,8 +104,7 @@ class EmailStore with ChangeNotifier {
       sender: 'Sandra Adams',
       time: '7 hrs ago',
       subject: 'Recipe to try',
-      message:
-          'Raspberry Pie: We should make this pie recipe tonight! The filling is '
+      message: 'Raspberry Pie: We should make this pie recipe tonight! The filling is '
           'very quick to put together.',
       avatar: '$_avatarsLocation/avatar_2.jpg',
       recipients: 'Jeff',
@@ -119,8 +117,7 @@ class EmailStore with ChangeNotifier {
       sender: 'Frank Hawkins',
       time: '4 hrs ago',
       subject: 'Your update on the Google Play Store is live!',
-      message:
-          'Your update is now live on the Play Store and available for your alpha users to start testing.\n\n'
+      message: 'Your update is now live on the Play Store and available for your alpha users to start testing.\n\n'
           'Your alpha testers will be automatically notified. If you\'d rather send them a link directly, go to your Google Play Console and follow the instructions for obtaining an open alpha testing link.',
       avatar: '$_avatarsLocation/avatar_4.jpg',
       recipients: 'Jeff',
@@ -144,8 +141,7 @@ class EmailStore with ChangeNotifier {
       sender: 'Allison Trabucco',
       time: '4 hrs ago',
       subject: 'Free money',
-      message:
-          'You\'ve been selected as a winner in our latest raffle! To claim your prize, click on the link.',
+      message: 'You\'ve been selected as a winner in our latest raffle! To claim your prize, click on the link.',
       avatar: '$_avatarsLocation/avatar_3.jpg',
       recipients: 'Jeff',
       containsPictures: false,
@@ -170,11 +166,9 @@ class EmailStore with ChangeNotifier {
   bool _onCompose = false;
   bool _bottomDrawerVisible = false;
   ThemeMode _currentTheme = ThemeMode.system;
-  SlowMotionSpeedSetting _currentSlowMotionSpeed =
-      SlowMotionSpeedSetting.normal;
+  SlowMotionSpeedSetting _currentSlowMotionSpeed = SlowMotionSpeedSetting.normal;
 
-  Map<String, Set<Email>> get emails =>
-      Map<String, Set<Email>>.unmodifiable(_categories);
+  Map<String, Set<Email>> get emails => Map<String, Set<Email>>.unmodifiable(_categories);
 
   void deleteEmail(String category, int id) {
     final email = _categories[category]!.elementAt(id);

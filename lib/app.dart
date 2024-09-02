@@ -16,8 +16,7 @@ class ReplyApp extends StatefulWidget {
 
 class ReplyAppState extends State<ReplyApp> {
   final RouterProvider _replyState = RouterProvider(const ReplyHomePath());
-  final ReplyRouteInformationParser _routeInformationParser =
-      ReplyRouteInformationParser();
+  final ReplyRouteInformationParser _routeInformationParser = ReplyRouteInformationParser();
   late final ReplyRouterDelegate _routerDelegate;
 
   @override
@@ -53,6 +52,8 @@ class ReplyAppState extends State<ReplyApp> {
     );
   }
 }
+
+// TODO: Move Theme Code to Static Class
 
 ThemeData _buildReplyLightTheme(BuildContext context) {
   final base = ThemeData.light();
@@ -133,9 +134,7 @@ ChipThemeData _buildChipTheme(
     padding: const EdgeInsets.all(4),
     shape: const StadiumBorder(),
     labelStyle: GoogleFonts.workSansTextTheme().bodyMedium!.copyWith(
-          color: brightness == Brightness.dark
-              ? ReplyColors.white50
-              : ReplyColors.black900,
+          color: brightness == Brightness.dark ? ReplyColors.white50 : ReplyColors.black900,
         ),
     secondaryLabelStyle: GoogleFonts.workSansTextTheme().bodyMedium!,
     brightness: brightness,
